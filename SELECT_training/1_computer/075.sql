@@ -22,20 +22,15 @@ WITH Item AS (SELECT model,
               FROM Printer
               GROUP BY model)
 
-SELECT maker,
-       Laptop_max_price,
-       PC_max_price,
-       Printer_max_price
-FROM (SELECT pr.maker,
-             MAX(CASE WHEN pr.type = 'Laptop' THEN it.max_price END)  AS Laptop_max_price,
-             MAX(CASE WHEN pr.type = 'PC' THEN it.max_price END)      AS PC_max_price,
-             MAX(CASE WHEN pr.type = 'Printer' THEN it.max_price END) AS Printer_max_price
-      FROM Product AS pr
-               LEFT JOIN Item AS it
-                         ON pr.model = it.model
-      GROUP BY pr.maker) AS X
-WHERE Laptop_max_price IS NOT NULL
-   OR PC_max_price IS NOT NULL
-   OR Printer_max_price IS NOT NULL
-
+SELECT pr.maker,
+       MAX(CASE WHEN pr.type = 'Laptop' THEN it.max_price END)  AS Laptop_max_price,
+       MAX(CASE WHEN pr.type = 'PC' THEN it.max_price END)      AS PC_max_price,
+       MAX(CASE WHEN pr.type = 'Printer' THEN it.max_price END) AS Printer_max_price
+FROM Product AS pr
+         LEFT JOIN Item AS it
+                   ON pr.model = it.model
+GROUP BY pr.maker
+HAVING MAX(CASE WHEN pr.type = 'Laptop' THEN it.max_price END) IS NOT NULL
+    OR MAX(CASE WHEN pr.type = 'PC' THEN it.max_price END) IS NOT NULL
+    OR MAX(CASE WHEN pr.type = 'Printer' THEN it.max_price END) IS NOT NULL
 
